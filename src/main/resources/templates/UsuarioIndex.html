@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{Layout}">
+    <head>
+        <title>Lista Usuarios</title>
+    </head>
+    <body layout:fragment="body">
+        <div class="container my-4">
+            <div class="col bg-primary text-white text-center p-4 rounded shadow">
+                <h1 class="display-5 fw-bold mb-0"> <i class="bi bi-people-fill"></i>Usuarios</h1>
+                <p class="lead mb-0">Gestión y administración de usuarios</p>
+            </div>
+            <div class="row my-2">
+                <!-- Buscadores -->
+                <div class="col-12">
+
+                    <form method="post" th:object="${usuariosBusqueda}" th:action="@{usuario}" 
+                          class="p-3 bg-white rounded shadow-sm border border-secondary-subtle">
+
+                        <div class="d-flex align-items-center mb-3">
+                            <h5 class="fw-bold text-primary mb-0">
+                                <i class="bi bi-search"></i> Filtros de búsqueda
+                            </h5>
+
+                            <div class="flex-grow-1 border-bottom mx-2"></div>
+
+                            <a th:href="@{/usuario/add}" class="btn btn-success shadow-sm px-3">
+                                <i class="bi bi-person-add"></i> Registrar
+                            </a>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="nombre" class="form-label fw-semibold">Nombre</label>
+                                <input th:field="*{Nombre}" type="text" class="form-control" id="nombre" placeholder="Ingrese nombre">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="apellidoPaterno" class="form-label fw-semibold">Apellido Paterno</label>
+                                <input th:field="*{ApellidoPaterno}" type="text" class="form-control" id="apellidoPaterno" placeholder="Ingrese apellido paterno">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="apellidoMaterno" class="form-label fw-semibold">Apellido Materno</label>
+                                <input th:field="*{ApellidoMaterno}" type="text" class="form-control" id="apellidoMaterno" placeholder="Ingrese apellido materno">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Rol</label>
+                                <select th:field="*{Rol.IdRol}" class="form-select">
+                                    <option value=0>Seleccione Rol</option>
+                                    <option th:each="rol: ${roles}" th:value="${rol.IdRol}" th:text="${rol.Nombre}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="container text-center text-black p-4 rounded shadow my-2">       
+                <h6 class="lead fw-bold mb-0"> Lista de Usuarios</h6>
+            </div>
+        </div>
+
+        <div class="container my-4">
+            <div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered border-2 border-dark shadow-sm rounded-3 align-middle">
+                        <thead class="bg-info text-white text-center sticky-top">
+                            <tr>
+                                <th class="bg-primary text-white col-5" scope="col" Usuario</th>
+                                <th class="bg-primary text-white col-4" scope="col" >Contacto</th>
+                                <th class="bg-primary text-white col-2" scope="col" >Rol</th>
+                                <th class="bg-primary text-white col-1" scope="col" >Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light text-center">
+                            <tr th:each="usuario: ${usuarios}">
+                                <td>
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <img th:if="${usuario.Imagen == null}"
+                                                 src="https://cdn-icons-png.flaticon.com/512/219/219983.png"
+                                                 class="rounded-circle" width="40" height="40"/>
+
+                                            <img th:if="${usuario.Imagen != null}"
+                                                 th:src="'data:image/png;base64,' + ${usuario.Imagen}"
+                                                 class="rounded-circle" width="40" height="40"/>
+                                        </div>
+                                        <div class="col">
+                                            <div class="fw-bold" th:text="|${usuario.nombre} ${usuario.apellidoPaterno} ${usuario.apellidoMaterno}|"></div>
+                                            <div class="text-muted" th:text="|${usuario.username}|"></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="text-start">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="bi bi-envelope-at me-2 text-primary"></i>
+                                        <span th:text="${usuario.email}"></span>
+                                    </div>
+
+                                    <div class="d-flex align-items-center mb-1">
+                                        <i class="bi bi-telephone me-2 text-success"></i>
+                                        <span th:text="${usuario.telefono}"></span>
+                                    </div>
+
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-phone me-2 text-info"></i>
+                                        <span th:text="${usuario.celular}"></span>
+                                    </div>
+                                </td>
+
+
+                                <td class="text-start">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-person-vcard me-2 text-secondary"></i>
+                                        <span th:text="${usuario.Rol.Nombre}"></span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <a th:href="@{/usuario/{detail}(detail = ${usuario.IdUsuario})}" role="button" class="btn btn-warning btn-sm me-2 shadow">
+                                        <i class="bi bi-pencil-square"></i></i>
+                                    </a>
+
+                                    <button type="button" class="btn btn-danger btn-sm deleteUsuarioBtn"
+                                            th:data-idUsuario="${usuario.IdUsuario}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script th:if="${successMessageAdd}" th:inline="javascript">
+            Swal.fire({
+            position: "top-end",
+                    icon: "success",
+                    title: [[${successMessageAdd}]],
+                    showConfirmButton: false,
+                    timer: 1500
+            });
+        </script>
+
+        <script th:inline="javascript">
+            $(".deleteUsuarioBtn").click(function () {
+            let idUsuario = $(this).attr("data-idUsuario");
+            Swal.fire({
+            title: "Deseas borrar este Usuario?",
+                    text: "No podras deshacer esta accion",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Si, Borrar Usuario!"
+            }).then((result) => {
+            if (result.isConfirmed) {
+            //mando petición
+            window.location.href = "/usuario/deleteUsuario/" + idUsuario;
+            }
+            });
+            });
+        </script>
+
+        <script th:if="${resultDelete}" th:inline="javascript">
+
+            if ([[${resultDelete.correct}]] == true){
+            Swal.fire({
+            title: "Eliminado!",
+                    text: "El usuario ha sido Eliminado.",
+                    icon: "success"
+            });
+            } else {
+            Swal.fire({
+            title: "No eliminado!",
+                    text: "El usuario no ha sido Eliminado.",
+                    icon: "error"
+            });
+            }
+        </script>
+    </body>
+</html>

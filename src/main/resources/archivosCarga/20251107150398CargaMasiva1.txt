@@ -1,0 +1,5 @@
+Carlos| Ramírez | Ramos | 1998-06-12 | 5554321987 | cramirez | carlos.ramirez@gmail.com | Cr12345! | M | 5587423311 | RARC980612HDFMRS09 | 2
+María | López | Hernández | 2000-03-25 | 5552149983 | mlopez | maria.lopez@yahoo.com | Ml2024@ | F | 5579132200 | LOHM000325MDFLRZ03 | 3
+José | Martínez | Pérez | 1995-11-10 | 5543218855 | jmartinez | jose.martinez@hotmail.com | Jm!2025 | M | 5598417755 | MAPJ951110HDFRRZ05 | 1
+Fernanda | Torres | Cruz | 1999-01-18 | 5559974123 | ftorres | fernanda.torres@gmail.com | Ft#19fc | F | 5572319998 | TOCF990118MDFRZN04 | 4
+Luis | Sánchez | Morales | 2001-07-09 | 5558822100 | lsanchez | luis.sanchez@outlook.com | Ls@2025 | M | 5581902233 | SAML010709HDFRRL08 | 2
