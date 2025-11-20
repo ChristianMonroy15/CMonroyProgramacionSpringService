@@ -7,7 +7,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class PaisJPADAOImplementation implements IPaisJPA {
 
     @Autowired

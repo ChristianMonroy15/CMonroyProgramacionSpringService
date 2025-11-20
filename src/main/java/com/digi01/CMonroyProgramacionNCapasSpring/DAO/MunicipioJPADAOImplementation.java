@@ -7,7 +7,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class MunicipioJPADAOImplementation implements IMunicipioJPA {
 
     @Autowired
@@ -18,12 +20,13 @@ public class MunicipioJPADAOImplementation implements IMunicipioJPA {
         Result result = new Result();
 
         try {
-            String query = "From EstadoJPA WHERE IdEstado = :IdEstado";
+            String query = "From MunicipioJPA municipioJPA WHERE municipioJPA.EstadoJPA.IdEstado = :IdEstado ORDER BY municipioJPA.Nombre";
             TypedQuery<MunicipioJPA> municipios = entityManager.createQuery(query, MunicipioJPA.class);
             municipios.setParameter("IdEstado", idEstado);
 
             result.objects = (List<Object>) (List<?>) municipios.getResultList();
             result.correct = true;
+            result.status = 200;
 
         } catch (Exception ex) {
             result.correct = false;

@@ -13,18 +13,19 @@ public class ColoniaJPADAOImplementation implements IColoniaJPA {
 
     @Autowired
     private EntityManager entityManager;
-    
+
     @Override
     public Result GetByIdMunicipio(int idMunicipio) {
         Result result = new Result();
 
         try {
-            String query = "From EstadoJPA WHERE IdMunicipio = :IdMunicipio";
+            String query = "FROM ColoniaJPA coloniaJPA WHERE coloniaJPA.MunicipioJPA.IdMunicipio = :IdMunicipio ORDER BY coloniaJPA.Nombre";
             TypedQuery<ColoniaJPA> colonias = entityManager.createQuery(query, ColoniaJPA.class);
             colonias.setParameter("IdMunicipio", idMunicipio);
 
             result.objects = (List<Object>) (List<?>) colonias.getResultList();
             result.correct = true;
+            result.status = 200;
 
         } catch (Exception ex) {
             result.correct = false;
@@ -39,12 +40,13 @@ public class ColoniaJPADAOImplementation implements IColoniaJPA {
         Result result = new Result();
 
         try {
-            String query = "From EstadoJPA WHERE CodigoPostal = :CodigoPostal";
+            String query = "From ColoniaJPA coloniaJPA WHERE CodigoPostal = :CodigoPostal ORDER BY coloniaJPA.Nombre";
             TypedQuery<ColoniaJPA> colonias = entityManager.createQuery(query, ColoniaJPA.class);
             colonias.setParameter("CodigoPostal", codigoPostal);
 
             result.objects = (List<Object>) (List<?>) colonias.getResultList();
             result.correct = true;
+            result.status = 200;
 
         } catch (Exception ex) {
             result.correct = false;
@@ -52,7 +54,7 @@ public class ColoniaJPADAOImplementation implements IColoniaJPA {
             result.ex = ex;
         }
         return result;
-        
+
     }
 
 }
