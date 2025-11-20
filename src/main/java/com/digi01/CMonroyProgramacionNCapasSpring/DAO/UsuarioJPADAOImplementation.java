@@ -27,7 +27,8 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             TypedQuery<UsuarioJPA> queryUsuario = entityManager.createQuery("FROM UsuarioJPA", UsuarioJPA.class);
             List<UsuarioJPA> usuarios = queryUsuario.getResultList();
 
-            result.objects = (List<Object>) (List<?>) usuarios;
+            
+            result.object = usuarios;
             result.correct = true;
 
         } catch (Exception ex) {
@@ -142,7 +143,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 query.setParameter("IdRol", usuarioJPA.Rol.getIdRol());
             }
 
-            result.objects = (List<Object>) (List<?>) query.getResultList();
+            result.object = query.getResultList();
             result.correct = true;
 
         } catch (Exception ex) {

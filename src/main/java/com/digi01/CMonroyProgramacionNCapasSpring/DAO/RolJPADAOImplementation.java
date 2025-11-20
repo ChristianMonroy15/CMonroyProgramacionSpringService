@@ -7,7 +7,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class RolJPADAOImplementation implements IRolJPA {
     @Autowired
     private EntityManager entityManager;
@@ -21,7 +23,7 @@ public class RolJPADAOImplementation implements IRolJPA {
             TypedQuery<RolJPA> queryRol = entityManager.createQuery("FROM RolJPA", RolJPA.class);
             List<RolJPA> roles = queryRol.getResultList();
 
-            result.objects = (List<Object>) (List<?>) roles;
+            result.object = roles;
             result.correct = true;
 
         } catch (Exception ex) {

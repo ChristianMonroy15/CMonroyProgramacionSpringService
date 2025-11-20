@@ -31,7 +31,7 @@ public class UsuarioRestController {
         Result result = new Result();
 
         try {
-            result.object = usuarioJPADAOImplementation.GetAll();
+            result = usuarioJPADAOImplementation.GetAll();
             result.correct = true;
             result.status = 200;
         } catch (Exception ex) {
