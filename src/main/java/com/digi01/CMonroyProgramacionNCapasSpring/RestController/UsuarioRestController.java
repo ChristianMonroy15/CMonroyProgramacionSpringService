@@ -50,7 +50,7 @@ public class UsuarioRestController {
         if (idUsuario > 0) {
             try {
 
-                result.object = usuarioJPADAOImplementation.GetById(idUsuario);
+                result = usuarioJPADAOImplementation.GetById(idUsuario);
                 result.correct = true;
                 result.status = 200;
 
@@ -199,7 +199,7 @@ public class UsuarioRestController {
         Result result = new Result();
         if (usuarioJPA == null) {
 
-            result = usuarioJPADAOImplementation.GetAll();            
+            result = usuarioJPADAOImplementation.GetAll();
 
         } else {
             try {
@@ -213,7 +213,6 @@ public class UsuarioRestController {
                 result.status = 500;
             }
         }
-
         return ResponseEntity.status(result.status).body(result);
     }
 

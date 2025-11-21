@@ -7,6 +7,7 @@ import jakarta.persistence.Parameter;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,7 +28,6 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             TypedQuery<UsuarioJPA> queryUsuario = entityManager.createQuery("FROM UsuarioJPA", UsuarioJPA.class);
             List<UsuarioJPA> usuarios = queryUsuario.getResultList();
 
-            
             result.object = usuarios;
             result.correct = true;
 
@@ -65,6 +65,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         try {
 
             UsuarioJPA usuarioJPA = entityManager.find(UsuarioJPA.class, IdUsuario);
+//            usuarioJPA.DireccionesJPA = new ArrayList<>(usuarioJPA.DireccionesJPA);
 
             result.object = usuarioJPA;
 
@@ -159,19 +160,19 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     @Override
     public Result UpdateImagen(int idUsuario, String base64) {
         Result result = new Result();
-        
+
         try {
-            
+
             UsuarioJPA usuarioBD = entityManager.find(UsuarioJPA.class, idUsuario);
             usuarioBD.setImagen(base64);
             result.correct = true;
-            
+
         } catch (Exception ex) {
             result.correct = true;
             result.errorMessage = ex.getLocalizedMessage();
             result.ex = ex;
         }
-        
+
         return result;
     }
 

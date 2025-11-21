@@ -24,8 +24,9 @@ public class PaisJPADAOImplementation implements IPaisJPA {
             TypedQuery<PaisJPA> queryPais = entityManager.createQuery("FROM PaisJPA", PaisJPA.class);
             List<PaisJPA> paises = queryPais.getResultList();
 
-            result.objects = (List<Object>) (List<?>) paises;
+            result.object = paises;
             result.correct = true;
+            result.status = 200;
 
         } catch (Exception ex) {
             result.correct = false;
