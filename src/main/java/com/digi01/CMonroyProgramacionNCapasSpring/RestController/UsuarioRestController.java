@@ -109,7 +109,9 @@ public class UsuarioRestController {
                 usuarioUpdate.setPassword(usuarioDB.getPassword());
 
                 usuarioUpdate.setIdUsuario(idUsuario);
-
+                
+                usuarioUpdate.setDireccionesJPA(usuarioDB.getDireccionesJPA());
+                
                 usuarioJPADAOImplementation.Update(usuarioUpdate);
                 result.correct = true;
                 result.status = 200;

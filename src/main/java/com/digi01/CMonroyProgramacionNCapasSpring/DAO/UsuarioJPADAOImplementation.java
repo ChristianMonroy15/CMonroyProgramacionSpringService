@@ -46,7 +46,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
     public Result Add(UsuarioJPA usuarioJPA) {
         Result result = new Result();
         try {
-
+            usuarioJPA.DireccionesJPA.get(0).UsuarioJPA = usuarioJPA;
             entityManager.persist(usuarioJPA);
             result.correct = true;
 
@@ -65,7 +65,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         try {
 
             UsuarioJPA usuarioJPA = entityManager.find(UsuarioJPA.class, IdUsuario);
-//            usuarioJPA.DireccionesJPA = new ArrayList<>(usuarioJPA.DireccionesJPA);
+//          usuarioJPA.DireccionesJPA = new ArrayList<>(usuarioJPA.DireccionesJPA);
 
             result.object = usuarioJPA;
 

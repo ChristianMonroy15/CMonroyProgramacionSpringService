@@ -23,7 +23,7 @@ public class EstadoJPADAOImplementation implements IEstadoJPA {
             TypedQuery<EstadoJPA> estados = entityManager.createQuery(query, EstadoJPA.class);
             estados.setParameter("IdPais", idPais);
 
-            result.objects = (List<Object>) (List<?>) estados.getResultList();
+            result.object = estados.getResultList();
             result.correct = true;
             result.status = 200;
 

@@ -38,27 +38,29 @@ public class DireccionJPADAOImplementation implements IDireccionJPA {
 
     @Transactional
     @Override
-    public Result Update(DireccionJPA direccionJPA, int idDireccion) {
+    public Result Update(DireccionJPA direccionJPA, int idUsuario) {
         Result result = new Result();
 
         try {
-            DireccionJPA direccionBD = entityManager.find(DireccionJPA.class, idDireccion);
+            DireccionJPA direccionBD = entityManager.find(DireccionJPA.class,direccionJPA.getIdDireccion());
 
             if (direccionBD == null) {
                 result.correct = false;
-                result.errorMessage = "No existe la dirección con id: " + idDireccion;
+                result.errorMessage = "No existe la dirección indicada.";
                 result.status = 400;
                 return result;
             }
+            if (direccionBD.UsuarioJPA.getIdUsuario() == idUsuario) {
+                direccionJPA.UsuarioJPA = direccionBD.UsuarioJPA;
+                entityManager.merge(direccionJPA);
+                result.correct = true;
+                result.status = 200;
+            } else {
+                result.correct = false;
+                result.errorMessage = "No puede ser procesada la operacion.";
+                result.status = 404;
 
-            direccionBD.setCalle(direccionJPA.getCalle());
-            direccionBD.setNumeroExterior(direccionJPA.getNumeroExterior());
-            direccionBD.setNumeroInterior(direccionJPA.getNumeroInterior());
-            direccionBD.ColoniaJPA.setIdColonia(direccionJPA.ColoniaJPA.getIdColonia()); 
-
-            entityManager.merge(direccionBD);
-
-            result.correct = true;
+            }
 
         } catch (Exception ex) {
             result.correct = false;

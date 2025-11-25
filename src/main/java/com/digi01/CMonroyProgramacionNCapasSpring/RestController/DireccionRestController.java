@@ -87,14 +87,13 @@ public class DireccionRestController {
         return ResponseEntity.status(result.status).body(result);
     }
 
-    @PutMapping("direccion/{idDireccion}")
-    public ResponseEntity Update(@PathVariable("idDireccion") int idDireccion,
+    @PutMapping("direccion/usuario/{idUsuario}")
+    public ResponseEntity Update(@PathVariable("idUsuario") int idUsuario,
             @RequestBody DireccionJPA direccionJPA) {
         Result result = new Result();
-        if (idDireccion > 0) {
+        if (direccionJPA.getIdDireccion() > 0) {
             try {
-                
-                direccionJPADAOImplementation.Update(direccionJPA, idDireccion);
+                direccionJPADAOImplementation.Update(direccionJPA, idUsuario);
                 result.correct = true;
                 result.status = 200;
 

@@ -23,7 +23,7 @@ public class ColoniaJPADAOImplementation implements IColoniaJPA {
             TypedQuery<ColoniaJPA> colonias = entityManager.createQuery(query, ColoniaJPA.class);
             colonias.setParameter("IdMunicipio", idMunicipio);
 
-            result.objects = (List<Object>) (List<?>) colonias.getResultList();
+            result.object = colonias.getResultList();
             result.correct = true;
             result.status = 200;
 
@@ -44,7 +44,7 @@ public class ColoniaJPADAOImplementation implements IColoniaJPA {
             TypedQuery<ColoniaJPA> colonias = entityManager.createQuery(query, ColoniaJPA.class);
             colonias.setParameter("CodigoPostal", codigoPostal);
 
-            result.objects = (List<Object>) (List<?>) colonias.getResultList();
+            result.object = colonias.getResultList();
             result.correct = true;
             result.status = 200;
 

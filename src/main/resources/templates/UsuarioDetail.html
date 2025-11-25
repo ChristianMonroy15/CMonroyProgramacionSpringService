@@ -272,11 +272,11 @@
                             </div>
 
                             <div class="modal-body bg-light">
-                                
-                                
+
+
                                 <!--Este es el Id 0 de la direccion = <p th:text="${Direccion.IdDireccion}"></p>-->
-                                
-                                
+
+
                                 <form th:object="${Direccion}" id="formDireccion" th:action="@{addDireccion/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" method="post">
                                     <!--<input type="hidden" name="IdUsuario" th:value="${usuario.IdUsuario}">--> 
                                     <input type="hidden" id="idDireccion" name="idDireccion" th:field="*{IdDireccion}">
@@ -583,51 +583,69 @@
             direccionModal.show();
             rebindDropDownEvents();
             });
-            $(".editDireccionBtn").click(function () {
+//Editar Direccion ------------------------------------------------------------------------            
+            $(".editDireccionBtn").click(async function () {
             let idDireccion = $(this).attr("data-idDireccion");
-            $.ajax({
-            url: "/usuario/direccion/" + idDireccion,
-                    method: "GET",
-                    success: function (data) {
-                    $("#idDireccion").val(data.idDireccion || "");
-                    $("#calle").val(data.calle || "");
-                    $("#numeroExterior").val(data.numeroExterior || "");
-                    $("#numeroInterior").val(data.numeroInterior || "");
-                    $("#ddlpais, #ddlestado, #ddlmunicipio").off("change");
-                    $("#ddlpais").val(data.colonia.municipio.estado.pais.idPais);
-                    $.get("estado/" + data.colonia.municipio.estado.pais.idPais, function (estados) {
-                    $("#ddlestado").empty().append("<option value=0>Selecciona</option>");
-                    $.each(estados.objects, function (i, e) {
-                    $("#ddlestado").append(`<option value="${e.idEstado}">${e.nombre}</option>`);
-                    });
-                    $("#ddlestado").val(data.colonia.municipio.estado.idEstado);
-                    $.get("municipio/" + data.colonia.municipio.estado.idEstado, function (municipios) {
-                    $("#ddlmunicipio").empty().append("<option value=0>Selecciona</option>");
-                    $.each(municipios.objects, function (i, m) {
-                    $("#ddlmunicipio").append(`<option value="${m.idMunicipio}">${m.nombre}</option>`);
-                    });
-                    $("#ddlmunicipio").val(data.colonia.municipio.idMunicipio);
-                    $.get("colonia/" + data.colonia.municipio.idMunicipio, function (colonias) {
-                    $("#ddlcolonia").empty().append("<option value=0>Selecciona</option>");
-                    $.each(colonias.objects, function (i, c) {
-                    $("#ddlcolonia").append(`<option value="${c.idColonia}" data-cp="${c.codigoPostal}">${c.nombre}</option>`);
-                    });
-                    $("#ddlcolonia").val(data.colonia.idColonia);
-                    $("#txtcp").val(data.colonia.codigoPostal);
-                    rebindDropDownEvents();
-                    });
-                    });
-                    });
-                    $("#tituloModalDireccion").text("Editar Dirección");
-                    $("#textoBotonDireccion").text("Actualizar Dirección");
-                    var direccionModal = new bootstrap.Modal(document.getElementById('direccionModal'));
-                    direccionModal.show();
-                    },
-                    error: function () {
-                    alert("No se pudo cargar la dirección");
-                    }
+            try {
+            // Obtener la dirección
+            let data = await $.get("http://localhost:8080/api/direccion/" + idDireccion);
+            if (!data.object) {
+            alert("No se encontró la dirección");
+            return;
+            }
+
+            let direccion = data.object;
+            let colonia = direccion.ColoniaJPA;
+            let municipio = colonia.MunicipioJPA;
+            let estado = municipio.EstadoJPA;
+            let pais = estado.PaisJPA;
+            // Setear campos de texto
+            $("#idDireccion").val(direccion.idDireccion || "");
+            $("#calle").val(direccion.calle || "");
+            $("#numeroExterior").val(direccion.numeroExterior || "");
+            $("#numeroInterior").val(direccion.numeroInterior || "");
+            // Desenlazar eventos de los selects
+            $("#ddlpais, #ddlestado, #ddlmunicipio").off("change");
+            // Setear país
+            $("#ddlpais").val(pais.idPais);
+            // Llenar estados
+            let estadosResp = await $.get("http://localhost:8080/api/estado/pais/" + pais.idPais);
+            let listaEstados = estadosResp.object || [];
+            $("#ddlestado").empty().append("<option value=0>Selecciona</option>");
+            $.each(listaEstados, function (i, e) {
+            $("#ddlestado").append(`<option value="${e.idEstado}">${e.nombre}</option>`);
             });
+            $("#ddlestado").val(estado.idEstado);
+            // Llenar municipios
+            let municipiosResp = await $.get("http://localhost:8080/api/municipio/estado/" + estado.idEstado);
+            let listaMunicipios = municipiosResp.object || [];
+            $("#ddlmunicipio").empty().append("<option value=0>Selecciona</option>");
+            $.each(listaMunicipios, function (i, m) {
+            $("#ddlmunicipio").append(`<option value="${m.idMunicipio}">${m.nombre}</option>`);
             });
+            $("#ddlmunicipio").val(municipio.idMunicipio);
+            // Llenar colonias
+            let coloniasResp = await $.get("http://localhost:8080/api/colonia/municipio/" + municipio.idMunicipio);
+            let listaColonias = coloniasResp.object || [];
+            $("#ddlcolonia").empty().append("<option value=0>Selecciona</option>");
+            $.each(listaColonias, function (i, c) {
+            $("#ddlcolonia").append(`<option value="${c.idColonia}" data-cp="${c.codigoPostal}">${c.nombre}</option>`);
+            });
+            $("#ddlcolonia").val(colonia.idColonia);
+            $("#txtcp").val(colonia.codigoPostal);
+            // Reenlazar eventos de cambio
+            rebindDropDownEvents();
+            // Mostrar modal
+            $("#tituloModalDireccion").text("Editar Dirección");
+            $("#textoBotonDireccion").text("Actualizar Dirección");
+            let direccionModal = new bootstrap.Modal(document.getElementById('direccionModal'));
+            direccionModal.show();
+            } catch (err) {
+            console.error(err);
+            alert("No se pudo cargar la dirección");
+            }
+            });
+//Mandar los drops otra vez-----------------------------------------------------------------------------------------------
             function rebindDropDownEvents() {
             $("#ddlpais").change(function () {
             $.get("estado/" + $("#ddlpais").val(), function (data) {

@@ -1,6 +1,7 @@
 
 package com.digi01.CMonroyProgramacionNCapasSpring.JPA;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -178,7 +179,14 @@ public class UsuarioJPA {
     public void setImagen(String Imagen) {
         this.Imagen = Imagen;
     }
-    
+
+    public List<DireccionJPA> getDireccionesJPA() {
+        return DireccionesJPA;
+    }
+
+    public void setDireccionesJPA(List<DireccionJPA> DireccionesJPA) {
+        this.DireccionesJPA = DireccionesJPA;
+    }
     
 
     public UsuarioJPA(int IdUsuario, String Nombre, String ApellidoPaterno, String ApellidoMaterno, String Email, String Password, Date FechaNacimiento, String Sexo, String Telefono, String Celular, String Username, String Curp, String Imagen) {
