@@ -109,9 +109,9 @@ public class UsuarioRestController {
                 usuarioUpdate.setPassword(usuarioDB.getPassword());
 
                 usuarioUpdate.setIdUsuario(idUsuario);
-                
+
                 usuarioUpdate.setDireccionesJPA(usuarioDB.getDireccionesJPA());
-                
+
                 usuarioJPADAOImplementation.Update(usuarioUpdate);
                 result.correct = true;
                 result.status = 200;
@@ -163,13 +163,13 @@ public class UsuarioRestController {
         return ResponseEntity.status(result.status).body(result);
     }
 
-    @PatchMapping("usuario/imagen/{idUsuario}")
-    public ResponseEntity UpdateImagen(@RequestParam("imagen") MultipartFile file,
+    @PatchMapping("usuario/imagen/update/{idUsuario}")
+    public ResponseEntity UpdateImagen(@RequestParam("imagen") String imagenBase64,
             @PathVariable("idUsuario") int idUsuario) {
 
         Result result = new Result();
 
-        if (file == null) {
+        if (imagenBase64 == null) {
 
             result.correct = false;
             result.status = 400;
@@ -177,8 +177,10 @@ public class UsuarioRestController {
         } else {
 
             try {
-                String base64 = Base64.getEncoder().encodeToString(file.getBytes());
-                result = usuarioJPADAOImplementation.UpdateImagen(idUsuario, base64);
+                if (imagenBase64.startsWith("data:image")) {
+                    imagenBase64 = imagenBase64.substring(imagenBase64.indexOf(",") + 1);
+                }
+                result = usuarioJPADAOImplementation.UpdateImagen(idUsuario, imagenBase64);
                 result.correct = true;
                 result.status = 202;
 
