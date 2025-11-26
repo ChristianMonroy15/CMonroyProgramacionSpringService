@@ -1,4 +1,3 @@
-
 package com.digi01.CMonroyProgramacionNCapasSpring.JPA;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.hibernate.annotations.DynamicUpdate;
-
 
 @Entity
 @Table(name = "USUARIO")
@@ -69,12 +67,15 @@ public class UsuarioJPA {
     @Column(name = "imagen")
     private String Imagen;
 
+    @Column(name = "status")
+    private Integer Status;
+
     @ManyToOne
     @JoinColumn(name = "idrol")
     public RolJPA Rol;
 
     @OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<DireccionJPA> DireccionesJPA = new ArrayList<>() ;
+    public List<DireccionJPA> DireccionesJPA = new ArrayList<>();
 
     public int getIdUsuario() {
         return IdUsuario;
@@ -180,6 +181,14 @@ public class UsuarioJPA {
         this.Imagen = Imagen;
     }
 
+    public Integer getStatus() {
+        return Status;
+    }
+
+    public void setStatus(Integer Status) {
+        this.Status = Status;
+    }
+
     public List<DireccionJPA> getDireccionesJPA() {
         return DireccionesJPA;
     }
@@ -187,7 +196,14 @@ public class UsuarioJPA {
     public void setDireccionesJPA(List<DireccionJPA> DireccionesJPA) {
         this.DireccionesJPA = DireccionesJPA;
     }
-    
+
+    public RolJPA getRol() {
+        return Rol;
+    }
+
+    public void setRol(RolJPA Rol) {
+        this.Rol = Rol;
+    }
 
     public UsuarioJPA(int IdUsuario, String Nombre, String ApellidoPaterno, String ApellidoMaterno, String Email, String Password, Date FechaNacimiento, String Sexo, String Telefono, String Celular, String Username, String Curp, String Imagen) {
         this.IdUsuario = IdUsuario;
@@ -204,9 +220,8 @@ public class UsuarioJPA {
         this.Curp = Curp;
         this.Imagen = Imagen;
     }
-    
-    public UsuarioJPA(){
+
+    public UsuarioJPA() {
     }
 
-   
 }

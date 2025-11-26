@@ -47,6 +47,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         Result result = new Result();
         try {
             usuarioJPA.DireccionesJPA.get(0).UsuarioJPA = usuarioJPA;
+            usuarioJPA.setStatus(1);
             entityManager.persist(usuarioJPA);
             result.correct = true;
 
@@ -132,6 +133,10 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
                 queryDinamica += "AND usuarioJPA.Rol.IdRol = :IdRol ";
             }
 
+            if (usuarioJPA.getStatus() != null && (usuarioJPA.getStatus() == 0 || usuarioJPA.getStatus() == 1)) {
+                queryDinamica += "AND usuarioJPA.Status = :Status ";
+            }
+
             queryDinamica = queryDinamica + "ORDER BY usuarioJPA.IdUsuario";
 
             TypedQuery<UsuarioJPA> query = entityManager.createQuery(queryDinamica, UsuarioJPA.class);
@@ -142,6 +147,10 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
             if (usuarioJPA.Rol != null && usuarioJPA.Rol.getIdRol() > 0) {
                 query.setParameter("IdRol", usuarioJPA.Rol.getIdRol());
+            }
+
+            if (usuarioJPA.getStatus() != null && (usuarioJPA.getStatus() == 0 || usuarioJPA.getStatus() == 1)) {
+                query.setParameter("Status", usuarioJPA.getStatus());
             }
 
             result.object = query.getResultList();
@@ -168,12 +177,44 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             result.correct = true;
 
         } catch (Exception ex) {
-            result.correct = true;
+            result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();
             result.ex = ex;
         }
 
         return result;
+    }
+
+    @Transactional
+    @Override
+    public Result UpdateStatus(int idUsuario, int status) {
+        Result result = new Result();
+
+        try {
+
+            UsuarioJPA usuarioBD = entityManager.find(UsuarioJPA.class, idUsuario);
+
+            if (usuarioBD == null) {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado";
+                result.status = 400;
+            }
+
+            usuarioBD.setStatus(status);
+            result.correct = true;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
+    @Override
+    public Result AddAll(List<UsuarioJPA> usuariosJPA) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
