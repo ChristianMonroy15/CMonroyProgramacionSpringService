@@ -58,7 +58,7 @@ public class UsuarioJPA {
     private String Celular;
 
     @Column(name = "username")
-    private String Username;
+    private String userName;
 
     @Column(name = "curp")
     private String Curp;
@@ -157,12 +157,12 @@ public class UsuarioJPA {
         this.Celular = Celular;
     }
 
-    public String getUsername() {
-        return Username;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUsername(String Username) {
-        this.Username = Username;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getCurp() {
@@ -216,7 +216,7 @@ public class UsuarioJPA {
         this.Sexo = Sexo;
         this.Telefono = Telefono;
         this.Celular = Celular;
-        this.Username = Username;
+        this.userName = Username;
         this.Curp = Curp;
         this.Imagen = Imagen;
     }

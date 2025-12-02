@@ -5,6 +5,7 @@ import com.digi01.CMonroyProgramacionNCapasSpring.JPA.ErrorCarga;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.Result;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.RolJPA;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
+import com.digi01.CMonroyProgramacionNCapasSpring.Service.LogService;
 import com.digi01.CMonroyProgramacionNCapasSpring.Service.ValidationService;
 import jakarta.servlet.http.HttpSession;
 import java.io.BufferedReader;
@@ -47,6 +48,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RestController
 @RequestMapping("api")
 public class UsuarioRestController {
+
+    @Autowired
+    private LogService logService;
 
     @Autowired
     private ValidationService validationService;
@@ -229,7 +233,7 @@ public class UsuarioRestController {
     @PatchMapping("usuario/update/status/{idUsuario}")
     public ResponseEntity UpdateStatus(
             @RequestParam("status") int status,
-            @PathVariable("idUsuario") int idUsuario) { 
+            @PathVariable("idUsuario") int idUsuario) {
 
         Result result = new Result();
 
@@ -372,7 +376,7 @@ public class UsuarioRestController {
                 usuario.setNombre(campos[0].trim());
                 usuario.setApellidoPaterno(campos[1].trim());
                 usuario.setApellidoMaterno(campos[2].trim());
-                usuario.setUsername(campos[3].trim());
+                usuario.setUserName(campos[3].trim());
                 usuario.setEmail(campos[4].trim());
                 usuario.setPassword(campos[5].trim());
 
@@ -421,7 +425,7 @@ public class UsuarioRestController {
                         row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK))
                 );
 
-                usuario.setUsername(formatter.formatCellValue(
+                usuario.setUserName(formatter.formatCellValue(
                         row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK))
                 );
                 usuario.setEmail(formatter.formatCellValue(

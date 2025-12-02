@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CMonroyProgramacionNCapasSpringServiceApplication {
+public class CMonroyProgramacionNCapasSpringApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CMonroyProgramacionNCapasSpringServiceApplication.class, args);
+		SpringApplication.run(CMonroyProgramacionNCapasSpringApplication.class, args);
 	}
 }
 
