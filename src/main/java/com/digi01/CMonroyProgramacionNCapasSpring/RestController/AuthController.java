@@ -1,5 +1,7 @@
 package com.digi01.CMonroyProgramacionNCapasSpring.RestController;
 
+import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
+import com.digi01.CMonroyProgramacionNCapasSpring.Security.CustomUserDetails;
 import com.digi01.CMonroyProgramacionNCapasSpring.Security.JwtService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,7 +51,15 @@ public class AuthController {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            String token = jwtService.generateToken(request.getUsername(), roles);
+            CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
+
+            int idUsuario = principal.getIdUsuario(); // debe existir
+
+            String token = jwtService.generateToken(
+                    request.getUsername(),
+                    roles,
+                    idUsuario
+            );
 
             return new TokenResponse(token);
 
@@ -59,12 +69,11 @@ public class AuthController {
             throw ex;
         }
     }
-    
+
     @PostConstruct
     public void generate() {
         System.out.println("BCrypt correcto: " + passwordEncoder.encode("qwerty"));
     }
-
 
     @Data
     public static class LoginRequest {

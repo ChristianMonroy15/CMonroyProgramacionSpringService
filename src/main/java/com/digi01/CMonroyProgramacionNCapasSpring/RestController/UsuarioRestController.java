@@ -1,5 +1,6 @@
 package com.digi01.CMonroyProgramacionNCapasSpring.RestController;
 
+import com.digi01.CMonroyProgramacionNCapasSpring.DAO.IUsuarioRepositoryDAO;
 import com.digi01.CMonroyProgramacionNCapasSpring.DAO.UsuarioJPADAOImplementation;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.ErrorCarga;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.Result;
@@ -28,6 +29,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -48,6 +50,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RestController
 @RequestMapping("api")
 public class UsuarioRestController {
+
+    @Autowired
+    private IUsuarioRepositoryDAO iUsuarioRepositoryDAO;
 
     @Autowired
     private LogService logService;
@@ -76,27 +81,40 @@ public class UsuarioRestController {
     }
 
     @GetMapping("usuario/{idUsuario}")
-    public ResponseEntity GetById(@PathVariable("idUsuario") int idUsuario) {
+    public ResponseEntity GetById(
+            @PathVariable("idUsuario") int idUsuario,
+            Authentication authentication) {
+
         Result result = new Result();
 
-        if (idUsuario > 0) {
-            try {
+        try {
+            String username = authentication.getName();
+
+            UsuarioJPA loggedUser = iUsuarioRepositoryDAO.findByUserName(username);
+
+            String role = loggedUser.getRol().getNombre();
+
+            if (role.equals("User") && loggedUser.getIdUsuario() != idUsuario) {
+                return ResponseEntity.status(403).body("No autorizado");
+            }
+
+            if (idUsuario > 0) {
 
                 result = usuarioJPADAOImplementation.GetById(idUsuario);
                 result.correct = true;
                 result.status = 200;
 
-            } catch (Exception ex) {
+            } else {
                 result.correct = false;
-                result.errorMessage = ex.getLocalizedMessage();
-                result.ex = ex;
-                result.status = 500;
+                result.status = 400;
             }
-        } else {
+
+        } catch (Exception ex) {
 
             result.correct = false;
-            result.status = 400;
-
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+            result.status = 500;
         }
 
         return ResponseEntity.status(result.status).body(result);
@@ -137,6 +155,8 @@ public class UsuarioRestController {
                 UsuarioJPA usuarioDB = (UsuarioJPA) resultUsuario.object;
 
                 UsuarioJPA usuarioUpdate = usuarioJPA;
+                
+                usuarioUpdate.setImagen(usuarioDB.getImagen());
 
                 usuarioUpdate.setPassword(usuarioDB.getPassword());
 

@@ -2,6 +2,10 @@ package com.digi01.CMonroyProgramacionNCapasSpring.Service;
 
 import com.digi01.CMonroyProgramacionNCapasSpring.DAO.IUsuarioRepositoryDAO;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
+import com.digi01.CMonroyProgramacionNCapasSpring.Security.CustomUserDetails;
+import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,9 +41,15 @@ public class UserDetailsJPAService implements UserDetailsService {
             System.out.println("🔍 Password (en BD): " + usuario.getPassword());
         }
 
-        return User.withUsername(usuario.getUserName())
-                .password(usuario.getPassword())
-                .roles(springRole)
-                .build();
+        List<GrantedAuthority> authorities
+                = List.of(new SimpleGrantedAuthority("ROLE_" + springRole));
+
+        return new CustomUserDetails(
+                usuario.getIdUsuario(), 
+                usuario.getUserName(),
+                usuario.getPassword(),
+                authorities
+        );
+
     }
 }

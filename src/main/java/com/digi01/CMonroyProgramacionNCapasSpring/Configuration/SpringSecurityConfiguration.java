@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -56,13 +57,36 @@ public class SpringSecurityConfiguration {
                 .sessionManagement(session
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login",
-                        "/api/**").permitAll()
+                // PUBLICAS sin token ni nada
+                .requestMatchers(
+                        "/login",
+                        "/auth/login",
+                        "/guardarToken",
+                        "/css/**",
+                        "/js/**",
+                        "/img/**",
+                        "/api/direccion/**",
+                        "/api/usuario/rol",
+                        "/api/pais/**",
+                        "/api/estado/**",
+                        "/api/municipio/**",
+                        "/api/colonia/**"
+                ).permitAll()
+                // ADMIN
+                .requestMatchers(HttpMethod.POST, "/api/usuario/**").hasRole("Admin")
+                .requestMatchers(HttpMethod.DELETE, "/api/usuario/**").hasRole("Admin")
+                
+                // LECTURA
+                .requestMatchers(HttpMethod.GET, "/api/usuario/**").authenticated()
+                // Cualquier otro /api requiere autenticación
+                .requestMatchers("/api/**").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/usuario/**").authenticated()
+                .requestMatchers(HttpMethod.PATCH, "/api/usuario/**").authenticated()
+                // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
                 )
                 .authenticationProvider(authProvider())
-                .addFilterBefore(jwtAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -22,11 +22,12 @@ public class JwtService {
 //    @Value("${jwt.expiration}")
 //    private long expirationMs;
 
-    public String generateToken(String username, List<String> roles) throws JOSEException {
+    public String generateToken(String username, List<String> roles,int idUsuario) throws JOSEException {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .subject(username)
                 .claim("roles", roles)
+                .claim("idUsuario", idUsuario)
                 //.expirationTime(new Date(System.currentTimeMillis() + expirationMs))
                 .issueTime(new Date())
                 .build();
