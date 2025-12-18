@@ -157,6 +157,8 @@ public class UsuarioRestController {
                 UsuarioJPA usuarioUpdate = usuarioJPA;
                 
                 usuarioUpdate.setImagen(usuarioDB.getImagen());
+                
+                usuarioUpdate.setStatus(usuarioDB.getStatus());
 
                 usuarioUpdate.setPassword(usuarioDB.getPassword());
 

@@ -2,6 +2,7 @@ package com.digi01.CMonroyProgramacionNCapasSpring.DAO;
 
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.Result;
+import com.digi01.CMonroyProgramacionNCapasSpring.Service.EmailService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Parameter;
 import jakarta.persistence.ParameterMode;
@@ -9,7 +10,9 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private EntityManager entityManager; //DataSource
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public Result GetAll() {
@@ -48,7 +57,12 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         try {
             usuarioJPA.DireccionesJPA.get(0).UsuarioJPA = usuarioJPA;
             usuarioJPA.setStatus(1);
+            usuarioJPA.setPassword(passwordEncoder.encode(usuarioJPA.getPassword()));
             entityManager.persist(usuarioJPA);
+            String token = UUID.randomUUID().toString();
+            usuarioJPA.setVerificationToken(token);
+            emailService.sendMail(usuarioJPA.getEmail(), token);
+
             result.correct = true;
 
         } catch (Exception ex) {
@@ -66,8 +80,6 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         try {
 
             UsuarioJPA usuarioJPA = entityManager.find(UsuarioJPA.class, IdUsuario);
-//          usuarioJPA.DireccionesJPA = new ArrayList<>(usuarioJPA.DireccionesJPA);
-
             result.object = usuarioJPA;
 
         } catch (Exception ex) {

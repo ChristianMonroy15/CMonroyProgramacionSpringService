@@ -1,8 +1,10 @@
 package com.digi01.CMonroyProgramacionNCapasSpring.RestController;
 
+import com.digi01.CMonroyProgramacionNCapasSpring.DTO.LoginErrorResponse;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
 import com.digi01.CMonroyProgramacionNCapasSpring.Security.CustomUserDetails;
 import com.digi01.CMonroyProgramacionNCapasSpring.Security.JwtService;
+import com.nimbusds.jose.JOSEException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
@@ -13,6 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
@@ -32,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public TokenResponse login(@RequestBody LoginRequest request, HttpServletResponse response) throws Exception {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) throws JOSEException {
 
         System.out.println("➡ Intentando autenticación para: " + request.getUsername());
 
@@ -46,27 +49,40 @@ public class AuthController {
 
             System.out.println("✔ AUTENTICACIÓN EXITOSA");
 
+            CustomUserDetails principal
+                    = (CustomUserDetails) authentication.getPrincipal();
+
             List<String> roles = authentication.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-
-            int idUsuario = principal.getIdUsuario(); // debe existir
-
             String token = jwtService.generateToken(
-                    request.getUsername(),
+                    principal.getUsername(),
                     roles,
-                    idUsuario
+                    principal.getIdUsuario()
             );
 
-            return new TokenResponse(token);
+            return ResponseEntity.ok(new TokenResponse(token));
 
-        } catch (Exception ex) {
-            System.out.println("❌ ERROR en autenticación: " + ex.getClass().getSimpleName());
-            System.out.println("❌ MENSAJE: " + ex.getMessage());
-            throw ex;
+        } catch (org.springframework.security.authentication.DisabledException ex) {
+
+            // CUENTA NO VERIFICADA
+            return ResponseEntity
+                    .status(403)
+                    .body(new LoginErrorResponse(
+                            "La cuenta no está verificada. Revisa tu correo.",
+                            "UNVERIFIED_ACCOUNT"
+                    ));
+
+        } catch (org.springframework.security.authentication.BadCredentialsException ex) {
+
+            return ResponseEntity
+                    .status(401)
+                    .body(new LoginErrorResponse(
+                            "Usuario o contraseña incorrectos",
+                            "BAD_CREDENTIALS"
+                    ));
         }
     }
 

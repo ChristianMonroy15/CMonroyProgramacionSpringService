@@ -69,6 +69,12 @@ public class UsuarioJPA {
 
     @Column(name = "status")
     private Integer Status;
+    
+    @Column(name = "isverified")
+    private Integer IsVerified;
+    
+    @Column(name = "verificationtoken")
+    private String VerificationToken;
 
     @ManyToOne
     @JoinColumn(name = "idrol")
@@ -189,6 +195,23 @@ public class UsuarioJPA {
         this.Status = Status;
     }
 
+    public Integer getIsVerified() {
+        return IsVerified;
+    }
+
+    public void setIsVerified(Integer IsVerified) {
+        this.IsVerified = IsVerified;
+    }
+
+    public String getVerificationToken() {
+        return VerificationToken;
+    }
+
+    public void setVerificationToken(String VerificationToken) {
+        this.VerificationToken = VerificationToken;
+    }
+    
+
     public List<DireccionJPA> getDireccionesJPA() {
         return DireccionesJPA;
     }
@@ -205,7 +228,7 @@ public class UsuarioJPA {
         this.Rol = Rol;
     }
 
-    public UsuarioJPA(int IdUsuario, String Nombre, String ApellidoPaterno, String ApellidoMaterno, String Email, String Password, Date FechaNacimiento, String Sexo, String Telefono, String Celular, String Username, String Curp, String Imagen) {
+    public UsuarioJPA(int IdUsuario, String Nombre, String ApellidoPaterno, String ApellidoMaterno, String Email, String Password, Date FechaNacimiento, String Sexo, String Telefono, String Celular, String userName, String Curp, String Imagen, Integer Status, Integer IsVerified, String VerificationToken) {
         this.IdUsuario = IdUsuario;
         this.Nombre = Nombre;
         this.ApellidoPaterno = ApellidoPaterno;
@@ -216,10 +239,15 @@ public class UsuarioJPA {
         this.Sexo = Sexo;
         this.Telefono = Telefono;
         this.Celular = Celular;
-        this.userName = Username;
+        this.userName = userName;
         this.Curp = Curp;
         this.Imagen = Imagen;
+        this.Status = Status;
+        this.IsVerified = IsVerified;
+        this.VerificationToken = VerificationToken;
     }
+
+    
 
     public UsuarioJPA() {
     }

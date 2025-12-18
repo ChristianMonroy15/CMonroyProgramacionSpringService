@@ -55,34 +55,31 @@ public class SpringSecurityConfiguration {
                 .cors(cors -> {
                 })
                 .sessionManagement(session
-                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authorizeHttpRequests(auth -> auth
-                // PUBLICAS sin token ni nada
+                // Preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // Públicos
                 .requestMatchers(
-                        "/login",
                         "/auth/login",
+                        "/api/verify",
+                        "/api/resend-verification",
                         "/guardarToken",
                         "/css/**",
                         "/js/**",
-                        "/img/**",
-                        "/api/direccion/**",
-                        "/api/usuario/rol",
-                        "/api/pais/**",
-                        "/api/estado/**",
-                        "/api/municipio/**",
-                        "/api/colonia/**"
+                        "/img/**"
                 ).permitAll()
-                // ADMIN
+                // Admin
                 .requestMatchers(HttpMethod.POST, "/api/usuario/**").hasRole("Admin")
                 .requestMatchers(HttpMethod.DELETE, "/api/usuario/**").hasRole("Admin")
-                
-                // LECTURA
+                // Usuario autenticado
                 .requestMatchers(HttpMethod.GET, "/api/usuario/**").authenticated()
-                // Cualquier otro /api requiere autenticación
-                .requestMatchers("/api/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/usuario/**").authenticated()
                 .requestMatchers(HttpMethod.PATCH, "/api/usuario/**").authenticated()
-                // Todo lo demás requiere autenticación
+                // Todo /api protegido
+                .requestMatchers("/api/**").authenticated()
+                // Resto
                 .anyRequest().authenticated()
                 )
                 .authenticationProvider(authProvider())
