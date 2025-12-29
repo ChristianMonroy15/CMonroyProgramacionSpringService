@@ -1,12 +1,20 @@
 package com.digi01.CMonroyProgramacionNCapasSpring.RestController;
 
+import com.digi01.CMonroyProgramacionNCapasSpring.DTO.ForgotPasswordRequest;
 import com.digi01.CMonroyProgramacionNCapasSpring.DTO.LoginErrorResponse;
+import com.digi01.CMonroyProgramacionNCapasSpring.DTO.ResetPasswordRequest;
+import com.digi01.CMonroyProgramacionNCapasSpring.JPA.PasswordResetTokenJPA;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
+import com.digi01.CMonroyProgramacionNCapasSpring.Repository.PasswordResetTokenRepository;
+import com.digi01.CMonroyProgramacionNCapasSpring.Repository.UserRepository;
 import com.digi01.CMonroyProgramacionNCapasSpring.Security.CustomUserDetails;
 import com.digi01.CMonroyProgramacionNCapasSpring.Security.JwtService;
+import com.digi01.CMonroyProgramacionNCapasSpring.Service.EmailService;
+import com.digi01.CMonroyProgramacionNCapasSpring.Service.PasswordResetService;
 import com.nimbusds.jose.JOSEException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Date;
 import lombok.Data;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +22,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +35,17 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    PasswordResetService passwordResetService;
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -52,6 +74,24 @@ public class AuthController {
             CustomUserDetails principal
                     = (CustomUserDetails) authentication.getPrincipal();
 
+            if (principal.getStatus() == 0) {
+                return ResponseEntity.status(403)
+                        .body(new LoginErrorResponse(
+                                "Tu cuenta está desactivada. Contacta al administrador.",
+                                "USER_DISABLED"
+                        ));
+            }
+
+            Integer verified = principal.getIsverified();
+
+            if (verified == null || verified == 0) {
+                return ResponseEntity.status(403)
+                        .body(new LoginErrorResponse(
+                                "Debes verificar tu correo antes de iniciar sesión.",
+                                "UNVERIFIED_ACCOUNT"
+                        ));
+            }
+
             List<String> roles = authentication.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
@@ -65,16 +105,6 @@ public class AuthController {
 
             return ResponseEntity.ok(new TokenResponse(token));
 
-        } catch (org.springframework.security.authentication.DisabledException ex) {
-
-            // CUENTA NO VERIFICADA
-            return ResponseEntity
-                    .status(403)
-                    .body(new LoginErrorResponse(
-                            "La cuenta no está verificada. Revisa tu correo.",
-                            "UNVERIFIED_ACCOUNT"
-                    ));
-
         } catch (org.springframework.security.authentication.BadCredentialsException ex) {
 
             return ResponseEntity
@@ -84,6 +114,28 @@ public class AuthController {
                             "BAD_CREDENTIALS"
                     ));
         }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(
+            @RequestBody ForgotPasswordRequest request) {
+
+        passwordResetService.processForgotPassword(request.getEmail());
+
+        return ResponseEntity.ok(
+                Map.of("message",
+                        "Se enviará un enlace de recuperación.")
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        
+        passwordResetService.resetPassword(request.getToken(), request.getPassword());
+        
+        return ResponseEntity.ok(Map.of(
+                "message", "Contraseña actualizada correctamente"
+        ));
     }
 
     @PostConstruct

@@ -10,25 +10,34 @@ public class CustomUserDetails implements UserDetails {
     private final String username;
     private final String password;
     private final Integer isverified;
+    private final Integer status;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(int idUsuario, String username, String password, Integer isverified,
+    public CustomUserDetails(int idUsuario, String username, String password, Integer isverified,Integer status,
             Collection<? extends GrantedAuthority> authorities) {
         this.idUsuario = idUsuario;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
         this.isverified = isverified;
+        this.status = status;
     }
 
-    public Integer getIsVerified() {
-        return isverified;
-    }
 
     public int getIdUsuario() {
         return idUsuario;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public Integer getIsverified() {
+        return isverified;
+    }
+
+    
+ 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
@@ -61,6 +70,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isverified != null && isverified == 1;
+        return true;
     }
 }

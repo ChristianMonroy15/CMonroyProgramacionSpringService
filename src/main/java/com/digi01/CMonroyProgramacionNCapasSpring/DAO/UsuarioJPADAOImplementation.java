@@ -6,6 +6,7 @@ import com.digi01.CMonroyProgramacionNCapasSpring.Service.EmailService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Parameter;
 import jakarta.persistence.ParameterMode;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
@@ -177,7 +178,6 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
         return result;
     }
 
-    @Transactional
     @Override
     public Result UpdateImagen(int idUsuario, String base64) {
         Result result = new Result();
@@ -187,46 +187,84 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             UsuarioJPA usuarioBD = entityManager.find(UsuarioJPA.class, idUsuario);
             usuarioBD.setImagen(base64);
             result.correct = true;
+            result.status = 202;
 
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();
             result.ex = ex;
+            result.status = 500;
         }
 
+        return result;
+    }
+
+    @Override
+    public Result UpdateStatus(int idUsuario, int status) {
+        Result result = new Result();
+
+        UsuarioJPA usuarioBD = entityManager.find(UsuarioJPA.class, idUsuario);
+
+        if (usuarioBD == null) {
+            result.correct = false;
+            result.status = 404;
+            result.errorMessage = "Usuario no encontrado";
+            return result;
+        }
+
+        usuarioBD.setStatus(status);
+
+        result.correct = true;
+        result.status = 200;
         return result;
     }
 
     @Transactional
     @Override
-    public Result UpdateStatus(int idUsuario, int status) {
+    public Result AddAll(List<UsuarioJPA> usuarios) {
+
         Result result = new Result();
 
         try {
 
-            UsuarioJPA usuarioBD = entityManager.find(UsuarioJPA.class, idUsuario);
+            for (UsuarioJPA usuario : usuarios) {
 
-            if (usuarioBD == null) {
-                result.correct = false;
-                result.errorMessage = "Usuario no encontrado";
-                result.status = 400;
+                // Relación Direcciones (si aplica)
+                if (usuario.getDireccionesJPA() != null && !usuario.getDireccionesJPA().isEmpty()) {
+                    usuario.getDireccionesJPA().get(0).UsuarioJPA = usuario;
+                }
+
+                // Valores por defecto
+                usuario.setStatus(1);
+
+                // Encriptar password
+                usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
+                // Generar token de verificación
+                String verificationToken = UUID.randomUUID().toString();
+                usuario.setVerificationToken(verificationToken);
+
+                // Persistir
+                entityManager.persist(usuario);
+
+                // Enviar correo
+                emailService.sendMail(usuario.getEmail(), verificationToken);
             }
 
-            usuarioBD.setStatus(status);
             result.correct = true;
 
         } catch (Exception ex) {
+
+            // Si uno falla, se revierte TODO
             result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();
             result.ex = ex;
+
+            // Forzar rollback explícito si lo deseas
+            throw ex;
         }
 
         return result;
-    }
-
-    @Override
-    public Result AddAll(List<UsuarioJPA> usuariosJPA) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

@@ -1,5 +1,6 @@
 package com.digi01.CMonroyProgramacionNCapasSpring.Configuration;
 
+import com.digi01.CMonroyProgramacionNCapasSpring.Security.CustomAuthEntryPoint;
 import com.digi01.CMonroyProgramacionNCapasSpring.Security.JwtAuthenticationFilter;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.List;
 import org.springframework.http.HttpMethod;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +30,14 @@ public class SpringSecurityConfiguration {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private CustomAuthEntryPoint customAuthEntryPoint;
+
+    @Bean
+    public Validator validator() {
+        return new LocalValidatorFactoryBean();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -54,6 +65,9 @@ public class SpringSecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {
                 })
+                .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(customAuthEntryPoint)
+                )
                 .sessionManagement(session
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -63,17 +77,28 @@ public class SpringSecurityConfiguration {
                 // Públicos
                 .requestMatchers(
                         "/auth/login",
+                        "/auth/forgot-password",
+                        "/auth/reset-password",
                         "/api/verify",
                         "/api/resend-verification",
                         "/guardarToken",
                         "/css/**",
                         "/js/**",
-                        "/img/**"
+                        "/img/**",
+                        "/api/direccion/**",
+                        "/api/usuario/rol",
+                        "/api/pais/**",
+                        "/api/estado/**",
+                        "/api/municipio/**",
+                        "/api/colonia/**"
                 ).permitAll()
                 // Admin
+                .requestMatchers(HttpMethod.PATCH, "/api/usuario/update/status/**").hasRole("Admin")
+                .requestMatchers(HttpMethod.POST, "/api/cargamasiva/**").hasRole("Admin")
                 .requestMatchers(HttpMethod.POST, "/api/usuario/**").hasRole("Admin")
                 .requestMatchers(HttpMethod.DELETE, "/api/usuario/**").hasRole("Admin")
                 // Usuario autenticado
+                .requestMatchers(HttpMethod.PATCH, "/api/usuario/imagen/update/**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/usuario/**").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/api/usuario/**").authenticated()
                 .requestMatchers(HttpMethod.PATCH, "/api/usuario/**").authenticated()

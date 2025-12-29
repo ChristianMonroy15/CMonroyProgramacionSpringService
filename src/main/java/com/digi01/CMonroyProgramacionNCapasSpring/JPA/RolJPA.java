@@ -22,7 +22,7 @@ public class RolJPA {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idrol")
-    private int IdRol;
+    private Integer IdRol;
     
     @Column(name = "nombre")
     private String Nombre;

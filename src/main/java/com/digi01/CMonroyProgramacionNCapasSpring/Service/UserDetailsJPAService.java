@@ -4,6 +4,7 @@ import com.digi01.CMonroyProgramacionNCapasSpring.DAO.IUsuarioRepositoryDAO;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
 import com.digi01.CMonroyProgramacionNCapasSpring.Security.CustomUserDetails;
 import java.util.List;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -33,6 +34,7 @@ public class UserDetailsJPAService implements UserDetailsService {
         String nombreRol = usuario.getRol().getNombre();
 
         String springRole = nombreRol;
+
         //borrar cuando termine
         System.out.println("🔍 loadUserByUsername() llamado con: " + username);
         System.out.println("🔍 Usuario encontrado: " + (usuario != null));
@@ -40,15 +42,17 @@ public class UserDetailsJPAService implements UserDetailsService {
             System.out.println("🔍 Rol del usuario: " + usuario.Rol.getNombre());
             System.out.println("🔍 Password (en BD): " + usuario.getPassword());
         }
+        /////////////////////////
 
         List<GrantedAuthority> authorities
                 = List.of(new SimpleGrantedAuthority("ROLE_" + springRole));
 
         return new CustomUserDetails(
-                usuario.getIdUsuario(), 
+                usuario.getIdUsuario(),
                 usuario.getUserName(),
                 usuario.getPassword(),
                 usuario.getIsVerified(),
+                usuario.getStatus(),
                 authorities
         );
 

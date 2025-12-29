@@ -7,6 +7,7 @@ import com.digi01.CMonroyProgramacionNCapasSpring.JPA.Result;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.RolJPA;
 import com.digi01.CMonroyProgramacionNCapasSpring.JPA.UsuarioJPA;
 import com.digi01.CMonroyProgramacionNCapasSpring.Service.LogService;
+import com.digi01.CMonroyProgramacionNCapasSpring.Service.UsuarioService;
 import com.digi01.CMonroyProgramacionNCapasSpring.Service.ValidationService;
 import jakarta.servlet.http.HttpSession;
 import java.io.BufferedReader;
@@ -62,6 +63,9 @@ public class UsuarioRestController {
 
     @Autowired
     private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @GetMapping("usuario")
     public ResponseEntity GetAll() {
@@ -155,9 +159,9 @@ public class UsuarioRestController {
                 UsuarioJPA usuarioDB = (UsuarioJPA) resultUsuario.object;
 
                 UsuarioJPA usuarioUpdate = usuarioJPA;
-                
+
                 usuarioUpdate.setImagen(usuarioDB.getImagen());
-                
+
                 usuarioUpdate.setStatus(usuarioDB.getStatus());
 
                 usuarioUpdate.setPassword(usuarioDB.getPassword());
@@ -234,9 +238,8 @@ public class UsuarioRestController {
                 if (imagenBase64.startsWith("data:image")) {
                     imagenBase64 = imagenBase64.substring(imagenBase64.indexOf(",") + 1);
                 }
-                result = usuarioJPADAOImplementation.UpdateImagen(idUsuario, imagenBase64);
-                result.correct = true;
-                result.status = 202;
+
+                result = usuarioService.UpdateImagen(idUsuario, imagenBase64);
 
             } catch (Exception ex) {
 
@@ -259,22 +262,7 @@ public class UsuarioRestController {
 
         Result result = new Result();
 
-        try {
-            result = usuarioJPADAOImplementation.UpdateStatus(idUsuario, status);
-
-            if (result.correct) {
-                result.status = 202;
-            } else {
-                result.status = 400;
-            }
-
-        } catch (Exception ex) {
-
-            result.correct = false;
-            result.errorMessage = ex.getLocalizedMessage();
-            result.ex = ex;
-            result.status = 500;
-        }
+        result = usuarioService.UpdateStatus(idUsuario, status);
 
         return ResponseEntity.status(result.status).body(result);
     }

@@ -1,6 +1,5 @@
 package com.digi01.CMonroyProgramacionNCapasSpring.JPA;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +13,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,36 +33,54 @@ public class UsuarioJPA {
     @Column(name = "idusuario")
     private int IdUsuario;
 
+    @NotBlank(message = "El nombre es obligatorio")
     @Column(name = "nombre")
     private String Nombre;
 
+    @NotBlank(message = "El apellido paterno es obligatorio")
     @Column(name = "apellidopaterno")
     private String ApellidoPaterno;
 
+    @NotBlank(message = "El apellido materno es obligatorio")
     @Column(name = "apellidomaterno")
     private String ApellidoMaterno;
 
+    @NotBlank(message = "El usuario es obligatorio")
+    @Column(name = "username")
+    private String userName;
+
+    @NotBlank(message = "El correo es obligatorio")
+    @Email(message = "El correo no tiene un formato válido")
     @Column(name = "email")
     private String Email;
 
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     @Column(name = "password")
     private String Password;
 
+    @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Temporal(TemporalType.DATE)
     @Column(name = "fechanacimiento")
     private Date FechaNacimiento;
 
+    @NotBlank(message = "El sexo es obligatorio")
     @Column(name = "sexo")
     private String Sexo;
 
-    @Column(name = "telefono")
-    private String Telefono;
-
+    @NotBlank(message = "El celular es obligatorio")
     @Column(name = "celular")
     private String Celular;
 
-    @Column(name = "username")
-    private String userName;
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Column(name = "telefono")
+    private String Telefono;
+
+    @NotBlank(message = "La CURP es obligatoria")
+    @Pattern(
+            regexp = "^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9]{2}$",
+            message = "La CURP no tiene un formato válido"
+    )
 
     @Column(name = "curp")
     private String Curp;
@@ -69,13 +91,14 @@ public class UsuarioJPA {
 
     @Column(name = "status")
     private Integer Status;
-    
+
     @Column(name = "isverified")
     private Integer IsVerified;
-    
+
     @Column(name = "verificationtoken")
     private String VerificationToken;
 
+    @NotNull(message = "El rol es obligatorio")
     @ManyToOne
     @JoinColumn(name = "idrol")
     public RolJPA Rol;
@@ -210,7 +233,6 @@ public class UsuarioJPA {
     public void setVerificationToken(String VerificationToken) {
         this.VerificationToken = VerificationToken;
     }
-    
 
     public List<DireccionJPA> getDireccionesJPA() {
         return DireccionesJPA;
@@ -246,8 +268,6 @@ public class UsuarioJPA {
         this.IsVerified = IsVerified;
         this.VerificationToken = VerificationToken;
     }
-
-    
 
     public UsuarioJPA() {
     }
